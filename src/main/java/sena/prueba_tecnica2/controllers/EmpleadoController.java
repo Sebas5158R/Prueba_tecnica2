@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController("/empleado")
 @RequestMapping(value = "/empleado")
-@CrossOrigin
+@CrossOrigin("*")
 public class EmpleadoController {
 
     @Autowired

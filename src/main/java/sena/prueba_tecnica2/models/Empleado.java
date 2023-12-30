@@ -32,7 +32,7 @@ public class Empleado {
 
     @ManyToOne()
     @JoinColumn(name = "idRol")
-    private Rol idRol;
+    private Rol rol;
 
     @Column(name = "password", length = 20, nullable = false)
     private String password;
@@ -88,12 +88,12 @@ public class Empleado {
         this.numeroDocumento = numeroDocumento;
     }
 
-    public Rol getIdRol() {
-        return idRol;
+    public Rol getRol() {
+        return rol;
     }
 
-    public void setIdRol(Rol idRol) {
-        this.idRol = idRol;
+    public void setRol(Rol rol) {
+        this.rol = rol;
     }
 
     public String getPassword() {
