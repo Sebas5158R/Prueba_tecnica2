@@ -1,24 +1,22 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Fragment } from "react";
+import {BrowserRouter as Router, Route, Routes} from "react-router-dom"
+import Login from './pages/login';
+import CrearCuenta from "./pages/crearCuenta";
+import HomeEmpleado from "./pages/empleado/HomeEmpleado";
+import ListarEmpleados from "./pages/empleado/ListarEmpleados";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Fragment>
+      <Router>
+        <Routes>
+          <Route path="/" exact element = {<Login/>}></Route>
+          <Route path="/crearCuenta" exact element = {<CrearCuenta/>}></Route>
+          <Route path="/home_empleado" exact element = {<HomeEmpleado/>}/>
+          <Route path="/listar_empleados" exact element = {<ListarEmpleados/>}/>
+        </Routes>
+      </Router>
+    </Fragment>
   );
 }
 
