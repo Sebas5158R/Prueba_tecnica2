@@ -11,8 +11,12 @@ public interface EmpleadoService {
 
     public String addEmpleado(Empleado empleado);
 
-    public Empleado findOne(Integer IdEmpleado);
+    public Empleado updateEmpleado(Integer idEmpleado, Empleado empleado);
+
+    public Empleado findOne(Integer idEmpleado);
 
     public void delete(Integer IdEmpleado);
+
+    public boolean authenticate(String email, String password);
 
 }

@@ -34,7 +34,7 @@ public class Cliente {
     @JoinColumn(name = "nitEmpresa")
     private Empresa nitEmpresa;
 
-    @Column(name = "password", length = 20, nullable = false)
+    @Column(name = "password", length = 120, nullable = false)
     private String password;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)

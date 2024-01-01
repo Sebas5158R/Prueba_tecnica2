@@ -34,7 +34,7 @@ public class Empleado {
     @JoinColumn(name = "idRol")
     private Rol rol;
 
-    @Column(name = "password", length = 20, nullable = false)
+    @Column(name = "password", length = 120, nullable = false)
     private String password;
 
     @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL)
