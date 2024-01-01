@@ -1,29 +1,40 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom"
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom"
 import axios from "axios";
 
 const Login = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [redirect, setRedirect] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (redirect) {
+      console.log("Redirigiendo a /home_empleado");
+      navigate("/home_empleado");
+    }
+  }, [redirect, navigate]);
 
   async function login(event) {
     event.preventDefault();
 
     try {
-      await axios.post("http://localhost:8080/api/login", {
+      const res = await axios.post("http://localhost:8080/api/login", {
         email: email,
         password: password,
-      }).then((res) => {
-        console.log(res.data);
-
-        if(res.status === 200) {
-          alert("Login exitoso")
-          window.location.href = '/home_empleado'
-        }else {
-          alert("Credenciales incorrectas")
-        }
       });
+
+      console.log(res.data);
+
+      if (res.status === 200) {
+        localStorage.setItem("token", res.data);
+        alert("Login exitoso");
+        setRedirect(true);
+      } else {
+        alert("Credenciales incorrectas");
+      }
+
     }catch(error) {
       console.log(error);
       alert("Error al intentar iniciar sesión");
@@ -44,7 +55,7 @@ const Login = () => {
             <p className="login-box-msg">
               Bienvenido, Ingrese sus credenciales
             </p>
-            <form onSubmit={'#'}>
+            <form onSubmit={login}>
               <div className="input-group mb-3">
                 <input
                   type="email"
@@ -90,7 +101,6 @@ const Login = () => {
                 <button
                   type="submit"
                   className="btn btn-block btn-primary"
-                  onClick={login}
                 >
                   Ingresar
                 </button>

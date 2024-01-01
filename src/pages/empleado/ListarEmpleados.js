@@ -7,7 +7,7 @@ import Footer from "../../components/Footer";
 import axios from "axios";
 
 
-const RegistroEmpleadoForm = ({ onSubmit }) => {
+const RegistroEmpleadoForm = ({ onSubmit, isEdit, empleadoEdit }) => {
     const [nombre, setNombre] = useState("");
     const [apellidos, setApellidos] = useState("");
     const [email, setEmail] = useState("");
@@ -42,6 +42,18 @@ const RegistroEmpleadoForm = ({ onSubmit }) => {
       setIdRol("");
       setPassword("");
     };
+
+    useEffect(() => {
+      if (isEdit) {
+        setNombre(empleadoEdit.nombre);
+        setApellidos(empleadoEdit.apellidos);
+        setEmail(empleadoEdit.email);
+        setTelefono(empleadoEdit.telefono);
+        setNumeroDocumento(empleadoEdit.numeroDocumento);
+        setIdRol(empleadoEdit.rol ? empleadoEdit.rol.idRol : "");
+        setPassword("");
+      }
+    }, [isEdit, empleadoEdit]);
   
     return (
       <form onSubmit={handleSubmit}>
@@ -86,6 +98,8 @@ const ListarEmpleados = () => {
 
     const [empleados, setEmpleados] = useState([]);
     const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [modalIsEditOpen, setModalIsEditOpen] = useState(false);
+    const [empleadoEdit, setEmpleadoEdit] = useState({});
 
     useEffect(() => {
         axios.get("http://localhost:8080/empleado/listarEmpleados")
@@ -98,12 +112,21 @@ const ListarEmpleados = () => {
           });
       }, []);
 
-    const openModal = () => {
+    const openModal = (isEdit, empleado) => {
+      if(isEdit) {
+        setEmpleadoEdit(empleado);
+        setModalIsEditOpen(true);
+      }else {
+        setEmpleadoEdit({});
         setModalIsOpen(true);
+      }
+        
     };
     
     const closeModal = () => {
         setModalIsOpen(false);
+        setModalIsEditOpen(false)
+        setEmpleadoEdit({})
     };
     
     const handleRegistroEmpleado = async (nuevoEmpleado) => {
@@ -123,6 +146,37 @@ const ListarEmpleados = () => {
         }
     };
 
+  
+  const handleEditarEmpleado = async (empleadoEditado) => {
+  try {
+    console.log("Datos a enviar al backend:", empleadoEditado);
+    const response = await axios.put(`http://localhost:8080/empleado/update/${empleadoEdit.idEmpleado}`, empleadoEditado,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    console.log("Respuesta del backend:", response);
+
+    if (response.status === 200) {
+      const empleadosActualizados = empleados.map((e) =>
+        e.idEmpleado === empleadoEdit.idEmpleado ? response.data : e
+      );
+
+      setEmpleados(empleadosActualizados);
+      closeModal();
+      window.location.reload();
+    } else {
+      console.error("Error al editar empleado:", response.data);
+    }
+  } catch (error) {
+    console.error("Error al realizar la solicitud al backend:", error);
+  }
+};
+
+
     return ( 
         <div className="wrapper">
       <Navbar></Navbar>
@@ -139,7 +193,7 @@ const ListarEmpleados = () => {
           <div className="card">
             <div className="card-header">
               <h3 className="card-title">
-                <button className="btn btn-block btn-primary btn-sm" onClick={openModal}>
+                <button className="btn btn-block btn-primary btn-sm" onClick={() => openModal(false, {})}>
                     Registrar Empleado
                 </button>
               </h3>
@@ -187,6 +241,11 @@ const ListarEmpleados = () => {
                         <td>{empleado.numeroDocumento}</td>
                         <td>{empleado.telefono}</td>
                         <td>{empleado.rol ? empleado.rol.nombreRol : 'Sin Rol'}</td>
+                        <td>
+                          <button className="btn btn-info btn-sm" onClick={() => openModal(true, empleado)}>
+                            Editar
+                          </button>
+                        </td>
                     </tr>
                 ))}
                 </tbody>
@@ -195,7 +254,7 @@ const ListarEmpleados = () => {
           </div>
         </section>
 
-        <Modal isOpen={modalIsOpen} onRequestClose={closeModal} contentLabel="Registrar Nuevo Empleado"
+        <Modal isOpen={modalIsOpen || modalIsEditOpen} onRequestClose={closeModal} contentLabel="Registrar o editar empleado"
         style={{
             overlay: {
               backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -209,8 +268,9 @@ const ListarEmpleados = () => {
               marginTop: '50px'
             },
           }}>
-            <h2>Registrar Nuevo Empleado</h2>
-            <RegistroEmpleadoForm onSubmit={handleRegistroEmpleado} />
+            <h2>{modalIsEditOpen ? "Editar empleado" : "Registrar un nuevo empleado"}</h2>
+            <RegistroEmpleadoForm onSubmit={modalIsEditOpen ? handleEditarEmpleado : handleRegistroEmpleado} 
+            isEdit={modalIsEditOpen} empleadoEdit={empleadoEdit}/>
         </Modal>
       </div>
       <Footer></Footer>
