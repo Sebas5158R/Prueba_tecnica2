@@ -13,10 +13,14 @@ public interface EmpleadoService {
 
     public Empleado updateEmpleado(Integer idEmpleado, Empleado empleado);
 
+    Empleado getEmpleadoById(Integer idEmpleado);
+
     public Empleado findOne(Integer idEmpleado);
 
     public void delete(Integer IdEmpleado);
 
     public boolean authenticate(String email, String password);
+
+    public String getRoleByEmail(String email);
 
 }

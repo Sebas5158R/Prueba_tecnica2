@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import sena.prueba_tecnica2.exceptions.EmpleadoNotFoundException;
 import sena.prueba_tecnica2.models.Empleado;
 import sena.prueba_tecnica2.repository.EmpleadoRepository;
 
@@ -61,6 +62,17 @@ public class EmpleadoServiceImpl implements EmpleadoService{
         }
     }
 
+    @Override
+    public Empleado getEmpleadoById(Integer idEmpleado) {
+        Optional<Empleado> optionalEmpleado = empleadoRepository.findById(idEmpleado);
+
+        if (optionalEmpleado.isPresent()) {
+            return optionalEmpleado.get();
+        } else {
+            throw new EmpleadoNotFoundException("Empleado con ID " + idEmpleado + " no encontrado");
+        }
+    }
+
 
     @Override
     public Empleado findOne(Integer idEmpleado) {
@@ -80,6 +92,15 @@ public class EmpleadoServiceImpl implements EmpleadoService{
             return passwordEncoder.matches(password, empleado.getPassword());
         }).orElse(false);
 
+    }
+
+    @Override
+    public String getRoleByEmail(String email) {
+        Optional<Empleado> empleadoOptional = empleadoRepository.findByEmail(email);
+
+        return empleadoOptional.map(empleado -> {
+            return empleado.getRol() != null ? empleado.getRol().getNombreRol() : null;
+        }).orElse(null);
     }
 
     public Optional<Empleado> findById(Integer id) {
