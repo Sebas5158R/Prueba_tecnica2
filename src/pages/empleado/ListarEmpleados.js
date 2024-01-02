@@ -5,6 +5,7 @@ import SidebarContainer from "../../components/SidebarContent";
 import ContentHeader from "../../components/ContentHeader";
 import Footer from "../../components/Footer";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 
 const RegistroEmpleadoForm = ({ onSubmit, isEdit, empleadoEdit }) => {
@@ -96,21 +97,33 @@ const RegistroEmpleadoForm = ({ onSubmit, isEdit, empleadoEdit }) => {
 
 const ListarEmpleados = () => {
 
+  const token = localStorage.getItem("token");
+
     const [empleados, setEmpleados] = useState([]);
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [modalIsEditOpen, setModalIsEditOpen] = useState(false);
     const [empleadoEdit, setEmpleadoEdit] = useState({});
+    const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get("http://localhost:8080/empleado/listarEmpleados")
+        axios.get("http://localhost:8080/empleado/listarEmpleados", {
+          headers: {
+            Authorization: token
+          }
+        })
           .then(response => {
             const empleadosOrdenados = response.data.sort((a, b) => a.idEmpleado - b.idEmpleado);
             setEmpleados(empleadosOrdenados);
           })
           .catch(error => {
-            console.error("Error al obtener la lista de empleados:", error);
+            if (error.response && error.response.status === 403) {
+              alert("No tienes permisos para acceder a esta función");
+              navigate("/home_empleado");
+          } else {
+              console.error("Error al obtener la lista de empleados:", error);
+          }
           });
-      }, []);
+      }, [token,navigate]);
 
     const openModal = (isEdit, empleado) => {
       if(isEdit) {
@@ -131,7 +144,11 @@ const ListarEmpleados = () => {
     
     const handleRegistroEmpleado = async (nuevoEmpleado) => {
         try {
-        const response = await axios.post("http://localhost:8080/empleado/add", nuevoEmpleado);
+        const response = await axios.post("http://localhost:8080/empleado/add", nuevoEmpleado, {
+          headers: {
+            Authorization: token
+          }
+        });
     
         if (response.status === 200) {
             setEmpleados([...empleados, response.data]);
