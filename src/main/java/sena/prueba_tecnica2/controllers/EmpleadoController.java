@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import sena.prueba_tecnica2.models.Empleado;
 import sena.prueba_tecnica2.services.EmpleadoServiceImpl;
+import sena.prueba_tecnica2.services.TokenService;
 
 import java.util.List;
 
@@ -22,14 +23,38 @@ public class EmpleadoController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private TokenService tokenService;
+
+    @PostMapping("/addPrimerEmpleado")
+    public String addPrimerEmpleado(@RequestBody Empleado empleado) {
+        return empleadoServiceImpl.addEmpleado(empleado);
+    }
+
     @GetMapping(path = { "/listarEmpleados", "empleados" })
-    public List<Empleado> listarEmpleados() {
-        return empleadoServiceImpl.getAllEmpleados();
+    public ResponseEntity<List<Empleado>> listarEmpleados(@RequestHeader("Authorization") String token) {
+        String rol = tokenService.extractRolFromToken(token);
+
+        if ("super administrador".equals(rol) || "administrador".equals(rol)) {
+            List<Empleado> empleados = empleadoServiceImpl.getAllEmpleados();
+            return ResponseEntity.ok(empleados);
+        } else {
+            String msg = "No tienes permisos para acceder a esta función";
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
     }
 
     @PostMapping("/add")
-    public String addEmpleado(@RequestBody Empleado empleado) {
-        return empleadoServiceImpl.addEmpleado(empleado);
+    public String addEmpleado(@RequestBody Empleado empleado, @RequestHeader("Authorization") String token) {
+        String email = tokenService.extractEmailFromToken(token);
+        String rol = tokenService.extractRolFromToken(token);
+
+        if ("super administrador".equals(rol) || "administrador".equals(rol)) {
+            return empleadoServiceImpl.addEmpleado(empleado);
+
+        }else {
+            return "Acceso denegado no tienes los permisos necesarios";
+        }
     }
 
     @PutMapping("/update/{idEmpleado}")

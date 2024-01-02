@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sena.prueba_tecnica2.Application;
 import sena.prueba_tecnica2.services.EmpleadoServiceImpl;
 import io.jsonwebtoken.Jwts;
+import sena.prueba_tecnica2.services.TokenService;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -45,9 +45,9 @@ public class AuthController {
         extraClaims.put("rol", rol);
 
         Date issuedAt = new Date(System.currentTimeMillis());
-        Date expiration = new Date(issuedAt.getTime() + (Application.EXPIRATION_IN_MINUTES * 60 * 1000));
+        Date expiration = new Date(issuedAt.getTime() + (TokenService.EXPIRATION_IN_MINUTES * 60 * 1000));
 
-        SecretKey secretKey = Keys.hmacShaKeyFor(Application.SECRET_KEY.getBytes());
+        SecretKey secretKey = Keys.hmacShaKeyFor(TokenService.SECRET_KEY.getBytes());
 
         return Jwts.builder()
                 .setSubject(email)

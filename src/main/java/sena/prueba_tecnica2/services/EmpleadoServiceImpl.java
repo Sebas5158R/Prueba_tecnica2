@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 import sena.prueba_tecnica2.exceptions.EmpleadoNotFoundException;
 import sena.prueba_tecnica2.models.Empleado;
 import sena.prueba_tecnica2.repository.EmpleadoRepository;
@@ -12,7 +11,6 @@ import sena.prueba_tecnica2.repository.EmpleadoRepository;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.regex.Pattern.matches;
 
 @Service
 public class EmpleadoServiceImpl implements EmpleadoService{
